@@ -1,0 +1,1 @@
+This is a project intended to compile a bunch of different functions relating to the Spotify Web API, and specifically the python implementation of spotipy. 
