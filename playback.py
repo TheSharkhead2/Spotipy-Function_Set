@@ -2,6 +2,28 @@
 This file comprises of functions that have to do with data on currently playing music. 
 """
 
+def check_playing(spObject):
+    """
+    Return the is_playing boolean to see if spotify is currently playing anything.
+    This should be run before other playback functions to prevent indexing errors.
+
+    Parameters
+    ----------
+    spObject: Spotipy API Object 
+        Spotipy object with scope of: 'user-read-currently playing'
+
+    Returns
+    -------
+    isPlaying: bool
+        Boolean denoting whether Spotify is currently playing or not
+    """
+
+    trackInfo = spObject.current_user_playing_track() #get track info for current track
+
+    isPlaying = trackInfo['item']["is_playing"]
+
+    return isPlaying
+
 def basic_song_info(spObject):
     """ 
     Return basic data for currently playing song. This is intended for use with 
@@ -22,8 +44,6 @@ def basic_song_info(spObject):
         The name of the album as a string 
     songID: str 
         The Spotify song id as a string
-    isPlaying: bool
-        Boolean denoting whether Spotify is currently playing or not
     """
 
     trackInfo = spObject.current_user_playing_track() #get track info for current track
@@ -34,9 +54,8 @@ def basic_song_info(spObject):
     albumName = trackInfo["item"]["album"]["name"] #get album name
     
     songID = trackInfo['item']['id'] #get song's track id
-    isPlaying = trackInfo['item']['is_playing'] #get song's current play status
 
-    return ((artist, songName, albumName, songID, isPlaying))
+    return ((artist, songName, albumName, songID))
 
 def song_image_info(spObject):
     """
