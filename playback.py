@@ -36,7 +36,7 @@ def basic_song_info(spObject):
     songID = trackInfo['item']['id'] #get song's track id
     isPlaying = trackInfo['item']['is_playing'] #get song's current play status
 
-    return ((artist, songName, albumName, songID, is_playing))
+    return ((artist, songName, albumName, songID, isPlaying))
 
 def song_image_info(spObject):
     """
@@ -62,7 +62,7 @@ def song_image_info(spObject):
     trackInfo = spObject.current_user_playing_track() #get track info for current track
 
     albumImageData = trackInfo['item']['album']['images'] #get album image list
-    artistImageData = spotify_object.search(q="artist:" + trackInfo['item']['artists'][0]["name"], type="artist")["artists"]["items"][0]["images"] #get artist image list
+    artistImageData = spObject.search(q="artist:" + trackInfo['item']['artists'][0]["name"], type="artist")["artists"]["items"][0]["images"] #get artist image list
 
 def playback_time_info(spObject, format="min-sec"):
     """
