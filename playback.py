@@ -116,3 +116,48 @@ def playback_time_info(spObject, format="min-sec"):
     
     #return strings as formatted
     return currentProgress, totalLength
+
+def get_song_attributes(spObject):
+    """ 
+    Return a list of song attributes from the Spotify API, including: 
+    ["artist", "album", "track_name", "track_id", "danceability", "energy", 
+    "key", "loudness", "mode", "speechiness", "instrumentalness", "liveness", 
+    "valence", "tempo", "duration_ms", "time_signature"]
+    More informantion on each audio feature here:
+    https://developer.spotify.com/documentation/web-api/reference/#object-audiofeaturesobject
+
+    Parameters
+    ----------
+    spObject: Spotipy API Object 
+        Spotipy object with at least the scope of: 'user-read-currently-playing'
+
+    Returns
+    -------
+    audioFeatures: dict
+        Dictionary mapping all audio features to coorisponding values for said 
+        features for currently playing song 
+
+    """
+    
+    #define list containing all the audio features being requested
+    playlist_features_list = ["artist", "album", "track_name", "track_id", 
+                             "danceability", "energy", "key", "loudness", "mode", "speechiness",
+                             "instrumentalness", "liveness", "valence", "tempo", "duration_ms", "time_signature"] 
+
+    trackInfo = spObject.current_user_playing_track() #get info on current track from Spotipy
+
+    songFeatures = {} #create empty dict for storing information
+
+    #extract basic song data into dict
+    songFeatures["artist"] = trackInfo["item"]["artists"][0]["name"]
+    songFeatures["album"] = trackInfo["item"]["album"]["name"]
+    songFeatures["track_name"] = trackInfo["item"]["name"]
+    songFeatures["track_id"] = trackInfo["item"]["id"]
+    #Get audio features into dict
+    audio_features = spObject.audio_features(songFeatures["track_id"])[0] #information on these here: https://developer.spotify.com/documentation/web-api/reference/#object-audiofeaturesobject
+    for feature in playlist_features_list[4:16]:
+        songFeatures[feature] = audio_features[feature]         
+
+    return songFeatures
+    
+
