@@ -83,6 +83,8 @@ def song_image_info(spObject):
     albumImageData = trackInfo['item']['album']['images'] #get album image list
     artistImageData = spObject.search(q="artist:" + trackInfo['item']['artists'][0]["name"], type="artist")["artists"]["items"][0]["images"] #get artist image list
 
+    return albumImageData, artistImageData
+
 def playback_time_info(spObject, format="min-sec"):
     """
     Return data about the current time in the currently playing song.
