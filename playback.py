@@ -19,8 +19,11 @@ def check_playing(spObject):
     """
 
     trackInfo = spObject.current_user_playing_track() #get track info for current track
-
-    isPlaying = trackInfo["is_playing"]
+    
+    try:
+        isPlaying = trackInfo["is_playing"]
+    except:
+        isPlaying = False
 
     return isPlaying
 
