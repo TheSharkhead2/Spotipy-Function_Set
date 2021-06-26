@@ -88,9 +88,9 @@ def song_image_info(spObject):
 
     return albumImageData, artistImageData
 
-def playback_time_info(spObject, format="min-sec"):
+def playback_time_info(spObject, format="ms"):
     """
-    Return data about the current time in the currently playing song.
+    Return data about the current time in the currently playing song. 
 
     Parameters
     ----------
@@ -98,7 +98,7 @@ def playback_time_info(spObject, format="min-sec"):
         Spotipy object with the scope of: 'user-read-currently-playing'
 
     format: string
-        "min-sec" or "ms" - output string format
+        "min-sec" or "ms" - output string format, defaults to "ms"
 
     Returns
     -------
@@ -137,6 +137,9 @@ def playback_time_info(spObject, format="min-sec"):
         elif seconds < 1:
             seconds = "00"
         totalLength = f"{minutes}:{seconds}"
+    
+    else: #default to "ms" behaviour
+        pass
     
     #return strings as formatted
     return currentProgress, totalLength
