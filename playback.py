@@ -186,5 +186,3 @@ def get_song_attributes(spObject):
         songFeatures[feature] = audio_features[feature]         
 
     return songFeatures
-    
-
