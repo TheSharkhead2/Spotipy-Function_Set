@@ -346,3 +346,24 @@ def set_shuffle(spObject, shuffle_state):
     
     new_shuffle_state = shuffle_state
     return new_shuffle_state
+
+def set_volume(spObject, volume_level):
+    """
+    Sets playback volume to the specified level.
+
+    Parameters
+    ----------
+
+    spObject: spotipy API object
+        Spotipy object with scope 'user-modify-playback-state'
+
+    volume_level: int
+        Value between 0 and 100 representing the desired volume level
+
+    Returns
+    -------
+
+    None
+    """
+
+    spObject.volume(volume_level)
