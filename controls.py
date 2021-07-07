@@ -313,7 +313,7 @@ def change_repeat(spObject, repeat_state=None):
 
     return new_repeat_state
 
-def set_shuffle(spObject, shuffle_state=None):
+def change_shuffle(spObject, shuffle_state=None):
     """
     Sets shuffle state to a certain value, or alternatively toggles it.
 
