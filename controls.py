@@ -2,6 +2,8 @@
 This file comprises of functions related to controlling playback.
 """
 
+from playback import check_playing, playback_settings_info
+
 def find_song(spObject, query, count=10):
     """
     Yes, this technically isn't directly related to controlling playback, but I think it makes the most sense to categorize here since it's really nice to integrate with the add_to_queue
@@ -128,8 +130,6 @@ def play_pause(spObject, playback_state=None):
     newPlaybackState: bool
         Updated playback state; see above
     """
-
-    from playback import check_playing
 
     if playback_state != None:
         if playback_state: #explicitly asks to pause playback
@@ -277,9 +277,10 @@ def switch_to_playlist(spObject, playlist_id):
 
     spObject.start_playback(context_uri=playlist_id)
 
-def change_repeat(spObject, current_repeat_type):
+def change_repeat(spObject, repeat_state=None):
+
     """
-    Shifts the repeat state of the playback 1 forward.
+    Sets repeat state to a certain value, or alternatively cycles the repeat state 1 forward.
 
     Parameters
     ----------
@@ -287,8 +288,8 @@ def change_repeat(spObject, current_repeat_type):
     spObject: spotipy API object
         Spotipy object with scope 'user-modify-playback-state'
     
-    current_repeat_type: str
-        Current repeat type; can be "song", "playlist", or "none"; this will be cycled 1 forward
+    repeat_type: str (opt.)
+        Desired repeat state: "none", "song", and "playlist"; if None is given will default to cycling 1 setting forward (e.g. "none" --> "song")     
 
     Returns
     -------
@@ -297,50 +298,24 @@ def change_repeat(spObject, current_repeat_type):
         New repeat type; see above
     """
 
-    if current_repeat_type == "song":
-        new_repeat_type = "playlist"
-    elif current_repeat_type == "playlist":
-        new_repeat_type = "none"
-    else:
-        current_repeat_type = "song"
+    if repeat_state != None: #new_repeat_state has been explicitly set
+        new_repeat_state = repeat_state
+    else: #automatically cycle the repeat state 1 forward
+        shuffle_state, repeat_state, device_info = playback_settings_info()
+        if repeat_state == "song":
+            new_repeat_state = "playlist"
+        elif repeat_state == "playlist":
+            new_repeat_state = "none"
+        else:
+            new_repeat_state = "song"
 
-    spObject.repeat(new_repeat_type)
-    
-    return new_repeat_type
+    spObject.repeat(new_repeat_state)
 
-def set_repeat(spObject, repeat_state):
+    return new_repeat_state
 
+def set_shuffle(spObject, shuffle_state=None):
     """
-    Uses change_repeat() to set repeat state to a certain value.
-
-    Parameters
-    ----------
-
-    spObject: spotipy API object
-        Spotipy object with scope 'user-modify-playback-state'
-    
-    repeat_type: str
-        Desired repeat state    
-
-    Returns
-    -------
-
-    new_repeat_type: str
-        New repeat type; see above
-    """
-
-    if repeat_state == "song":
-        new_repeat_type = change_repeat(spObject, "none")
-    elif repeat_state == "playlist":
-        new_repeat_type = change_repeat(spObject, "song")
-    else:
-        new_repeat_type = change_repeat(spObject, "playlist")
-    
-    return new_repeat_type
-
-def set_shuffle(spObject, shuffle_state):
-    """
-    Toggles shuffle mode.
+    Sets shuffle state to a certain value, or alternatively toggles it.
 
     Parameters
     ----------
@@ -348,8 +323,8 @@ def set_shuffle(spObject, shuffle_state):
     spObject: spotipy API object
         Spotipy object with scope 'user-modify-playback-state'
 
-    shuffle_state: bool
-        Desired shuffle state; True if shuffle, False if not shuffle
+    shuffle_state: bool (opt.)
+        Desired shuffle state; True if shuffle, False if not shuffle; if None is given will default to toggling between shuffle and non-shufffle modes
 
     Returns
     -------
@@ -358,9 +333,14 @@ def set_shuffle(spObject, shuffle_state):
         New shuffle state; see above
     """
 
-    spObject.shuffle(shuffle_state)
+    if shuffle_state != None: #new_shuffle_state has been explicitly set
+        new_shuffle_state = shuffle_state
+    else: #automatically toggle the shuffle state
+        shuffle_state, repeat_state, device_info = playback_settings_info()
+        new_shuffle_state = not shuffle_state
     
-    new_shuffle_state = shuffle_state
+    spObject.shuffle(new_shuffle_state)
+
     return new_shuffle_state
 
 def set_volume(spObject, volume_level):
