@@ -19,7 +19,7 @@ def find_song(spObject, query, count=10):
         String to query the spotify api...things like artist/song/market can be specified using tags 
         (https://developer.spotify.com/documentation/web-api/reference/#endpoint-search for more info)
 
-    count: int
+    count: int (opt.)
         Integer specifying how many results to return; defaults to 10
 
     Returns
@@ -108,30 +108,46 @@ def skip_previous(spObject):
     
     spObject.previous_track()
 
-def play_pause(spObject):
+def play_pause(spObject, playback_state=None):
     """
     Pauses playback if something is currently playing, stops playback if nothing is. 
 
     Parameters
     ----------
+
     spObject: spotipy API object
         Spotipy object with scope 'user-modify-playback-state'
+
+    playback_state: bool (opt.)
+        Desired playback state, if any; True if playing, False otherwise
+        If no playback_state given, will automatically toggle playback
 
     Returns
     -------
     
-    playbackState: bool
-        True if now playing, False if not
+    newPlaybackState: bool
+        Updated playback state; see above
     """
 
-    try:
-        spObject.pause_playback()
-        playbackState = False
-    except:
-        spObject.start_playback()
-        playbackState = True
-    
-    return playbackState
+    from playback import check_playing
+
+    if playback_state != None:
+        if playback_state: #explicitly asks to pause playback
+            spObject.pause_playback()
+            newPlaybackState = False
+        else: #explicitly asks to play playback
+            spObject.start_playback()
+            newPlaybackState = True
+        
+    else: #no explicit playback mode set, run auto-toggling system
+        if check_playing():
+            spObject.pause_playback()
+            newPlaybackState = False
+        else:
+            spObject.start_playback()
+            newPlaybackState = True
+        
+    return newPlaybackState
 
 def get_devices(spObject):
     """
@@ -200,7 +216,7 @@ def get_playlists(spObject, username, display_username, count=20):
     display_username: str
         Display username of the current spotify user; see above
 
-    count: int
+    count: int (opt.)
         Integer from 1 to 50; denotes maximum number of results. Default 20
 
     Returns
