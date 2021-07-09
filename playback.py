@@ -144,7 +144,45 @@ def playback_time_info(spObject, format="ms"):
     #return strings as formatted
     return currentProgress, totalLength
 
+def playback_settings_info(spObject):
+    """
+    Gets data about current playback's settings: shuffle state, repeat state, and device id/name/type.
+
+    Parameters
+    ----------
+
+    spObject: spotipy API object
+        Spotipy object with any scope
+
+    Returns
+    -------
+
+    shuffle_state: str
+        True if playback is currently shuffling, False otherwise
+
+    repeat_state: str
+        "none", "track", or "playlist" depending on current repeat state
+
+    device_info: dict
+        dictionary with device info using the format {
+            "id": device id,
+            "name": device name,
+            "type": device type
+        }
+
+    """
+    data = spObject.current_playback()
+
+    shuffle_state = data["shuffle_state"]
+    repeate_state = data["repeat_state"]
+    device_info = {
+        "id": data["device"]["id"],
+        "name": data["device"]["name"],
+        "type": data["device"]["type"]
+    }
+
 def get_song_attributes(spObject):
+
     """ 
     Return a list of song attributes from the Spotify API, including: 
     ["artist", "album", "track_name", "track_id", "danceability", "energy", 
