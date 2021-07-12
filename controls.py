@@ -2,9 +2,18 @@
 This file comprises of functions related to controlling playback.
 """
 
+#importing libraries
 from SpotipyFunction_Set.authenticator import Authenticator, ReauthenticationDecorator
 
 class Controls(Authenticator):
+    """
+    This class is a conglomerate of functions relating to controls in the Spotipy library (Spotify API python port).
+    This class inherits from the Authenticator class and can therefore reauthenticate the API access token when need 
+    be. Each function that needs this functionality should have the decorator: 
+    @ReauthenticationDecorator.reauthorization_check. As this is a child of the Authenticator class, it also requires
+    the same input parameters when initializing the class.
+
+    """
 
     def __init__(self, CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope):
 

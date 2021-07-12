@@ -9,6 +9,15 @@ import spotipy
 import spotipy.util as util    
 
 class ReauthenticationDecorator:
+    """
+    THIS IS ONLY A WRAPPER CLASS. DO NOT CREATE AN INSTANCE OF THIS CLASS.
+
+    This class is used to store the decorator necessary to refresh the spotipy
+    API token when it expires. This needs to be used only in classes that inherit 
+    from the class: Authenticator. 
+
+    """
+
     @classmethod
     def reauthorization_check(cls, func):
         """
@@ -31,6 +40,33 @@ class ReauthenticationDecorator:
         
 
 class Authenticator:
+    """
+    Parent Class
+    ------ -----
+
+    This is a class that can be inherited from inorder to allow each library 
+    to reauthenticate with spotipy when necessary. Each new library should be 
+    a class that inherits from this one. 
+
+    Parameters
+    ----------
+
+    CLIENT_ID: str 
+        Spotify API client id. 
+
+    CLIENT_SECRET: str
+        Spotify API client secret. 
+
+    SPOTIFY_USERNAME: str
+        Spotify username for user using program.
+
+    redirect_uri: str 
+        Redirect uri for Spotify API calls. 
+
+    scope: str 
+        Scope for using Spotify API
+
+    """
 
     def __init__(self, CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope):
         self._CLIENT_ID = CLIENT_ID
