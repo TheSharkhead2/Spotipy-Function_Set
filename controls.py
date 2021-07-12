@@ -2,7 +2,7 @@
 This file comprises of functions related to controlling playback.
 """
 
-from SpotipyFunction_Set.authenticator import Authenticator
+from SpotipyFunction_Set.authenticator import Authenticator, ReauthenticationDecorator
 
 class Controls(Authenticator):
 
@@ -10,6 +10,7 @@ class Controls(Authenticator):
 
         super().__init__(CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope)
 
+    @ReauthenticationDecorator.reauthorization_check
     def check_playing(self):
         """
         Return the is_playing boolean to see if spotify is currently playing anything.
@@ -35,6 +36,7 @@ class Controls(Authenticator):
 
         return isPlaying
 
+    @ReauthenticationDecorator.reauthorization_check
     def playback_settings_info(self):
         """
         Gets data about current playback's settings: shuffle state, repeat state, and device id/name/type.
@@ -72,6 +74,7 @@ class Controls(Authenticator):
             "type": data["device"]["type"]
         }
 
+    @ReauthenticationDecorator.reauthorization_check
     def find_song(self, query, count=10):
         """
         Yes, this technically isn't directly related to controlling playback, but I think it makes the most sense to categorize here since it's really nice to integrate with the add_to_queue
@@ -123,6 +126,7 @@ class Controls(Authenticator):
 
         return results
 
+    @ReauthenticationDecorator.reauthorization_check
     def add_song_to_queue(self, songData):
         """
         Function that adds a song to the user's queue based on the song's data (uri, id, url)
@@ -144,6 +148,7 @@ class Controls(Authenticator):
 
         self.spotipyObject.add_to_queue(songData)
 
+    @ReauthenticationDecorator.reauthorization_check
     def skip_next(self):
         """
         Skips to the next song in the user's queue.
@@ -161,6 +166,7 @@ class Controls(Authenticator):
         
         self.spotipyObject.next_track()
 
+    @ReauthenticationDecorator.reauthorization_check
     def skip_previous(self):
         """
         Skips to the previous song in the user's queue.
@@ -178,6 +184,7 @@ class Controls(Authenticator):
         
         self.spotipyObject.previous_track()
 
+    @ReauthenticationDecorator.reauthorization_check
     def play_pause(self, playback_state=None):
         """
         Pauses playback if something is currently playing, stops playback if nothing is. 
@@ -217,6 +224,7 @@ class Controls(Authenticator):
             
         return newPlaybackState
 
+    @ReauthenticationDecorator.reauthorization_check
     def get_devices(self):
         """
         Gets a list of the user's currently available devices. Like find_song(), this isn't directly related to playback, but is nice to include with switch_to_device().
@@ -250,6 +258,7 @@ class Controls(Authenticator):
 
         return results
 
+    @ReauthenticationDecorator.reauthorization_check
     def switch_to_device(self, device_id):
         """
         Switches playback to the device specified and starts it.
@@ -268,6 +277,7 @@ class Controls(Authenticator):
         
         self.spotipyObject.transfer_playback(device_id, force_play=True)
 
+    @ReauthenticationDecorator.reauthorization_check
     def get_playlists(self, username, display_username, count=20):
         """
         Gets up to 50 of the user's playlists. Like get_devices() and find_song(), will be nice to use with switch_to_playlist().
@@ -324,6 +334,7 @@ class Controls(Authenticator):
         
         return results
 
+    @ReauthenticationDecorator.reauthorization_check
     def switch_to_playlist(self, playlist_id):
         """
         Switches playback to the given playlist.
@@ -345,6 +356,7 @@ class Controls(Authenticator):
 
         self.spotipyObject.start_playback(context_uri=playlist_id)
 
+    @ReauthenticationDecorator.reauthorization_check
     def change_repeat(self, repeat_state=None):
 
         """
@@ -381,6 +393,7 @@ class Controls(Authenticator):
 
         return new_repeat_state
 
+    @ReauthenticationDecorator.reauthorization_check
     def change_shuffle(self, shuffle_state=None):
         """
         Sets shuffle state to a certain value, or alternatively toggles it.
@@ -411,6 +424,7 @@ class Controls(Authenticator):
 
         return new_shuffle_state
 
+    @ReauthenticationDecorator.reauthorization_check
     def set_volume(self, volume_level):
         """
         Sets playback volume to the specified level.

@@ -6,7 +6,29 @@ whenever the key expires. This class is intended to be inherited by specific mod
 
 #importing external modules 
 import spotipy
-import spotipy.util as util
+import spotipy.util as util    
+
+class ReauthenticationDecorator:
+    @classmethod
+    def reauthorization_check(cls, func):
+        """
+        Should be used as decorator to catch errors when running functions. This 
+        is specifically made to deal with periodic "timing out" of the Spotipy 
+        object. If an error is caught, this will simply attempt to refresh the 
+        token and run the function again. 
+
+        """
+        
+        def wrapper(*args, **kwargs):
+            #if an error occurs when running function, assume spotipy timing out error and refresh token 
+            try: 
+                return func(*args, **kwargs)
+            except:
+                args[0].refresh_token_function()
+                return func(*args, **kwargs)
+
+        return wrapper
+        
 
 class Authenticator:
 
@@ -28,20 +50,4 @@ class Authenticator:
         token = util.prompt_for_user_token(self._USERNAME, self.scope, self._CLIENT_ID, self._CLIENT_SECRET, self.redirect_uri)
         self.spotipyObject =  spotipy.Spotify(auth=token)
 
-    def reauthorization_check(self, func):
-        """
-        Should be used as decorator to catch errors when running functions. This 
-        is specifically made to deal with periodic "timing out" of the Spotipy 
-        object. If an error is caught, this will simply attempt to refresh the 
-        token and run the function again. 
-
-        """
-        def wrapper(*args, **kwargs):
-            #if an error occurs when running function, assume spotipy timing out error and refresh token 
-            try: 
-                return func(*args, **kwargs)
-            except:
-                self._create_user_object()
-                return func(*args, **kwargs)
-
-        return wrapper
+    
