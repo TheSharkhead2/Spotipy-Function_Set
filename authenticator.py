@@ -33,7 +33,8 @@ class ReauthenticationDecorator:
             try: 
                 return func(*args, **kwargs)
             except:
-                args[0].refresh_token_function()
+                print("Spotipy token may be expired... Refreshing token...")
+                args[0]._create_user_object()
                 return func(*args, **kwargs)
 
         return wrapper
