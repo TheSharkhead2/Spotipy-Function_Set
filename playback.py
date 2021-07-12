@@ -9,6 +9,7 @@ class Playback(Authenticator):
     def __init__(self, CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope):
         super().__init__(CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope)
 
+    @ReauthenticationDecorator.reauthorization_check
     def basic_song_info(self):
         """ 
         Return basic data for currently playing song. This is intended for use with 
@@ -42,6 +43,7 @@ class Playback(Authenticator):
 
         return ((artist, songName, albumName, songID))
 
+    @ReauthenticationDecorator.reauthorization_check
     def song_image_info(self):
         """
         Return data around the currently playing song's album image and artist image.
@@ -70,6 +72,7 @@ class Playback(Authenticator):
 
         return albumImageData, artistImageData
 
+    @ReauthenticationDecorator.reauthorization_check
     def playback_time_info(self, format="ms"):
         """
         Return data about the current time in the currently playing song. 
@@ -126,6 +129,7 @@ class Playback(Authenticator):
         #return strings as formatted
         return currentProgress, totalLength
 
+    @ReauthenticationDecorator.reauthorization_check
     def get_song_attributes(self):
 
         """ 
