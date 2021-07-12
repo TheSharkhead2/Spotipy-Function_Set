@@ -1,7 +1,7 @@
 """ 
 This file comprises of functions that have to do with data on currently playing music. 
 """
-from SpotipyFunction_Set.authenticator import Authenticator
+from SpotipyFunction_Set.authenticator import Authenticator, ReauthenticationDecorator
 
 
 class Playback(Authenticator):
