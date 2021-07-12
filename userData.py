@@ -8,7 +8,11 @@ from SpotipyFunction_Set.authenticator import Authenticator, ReauthenticationDec
 
 class UserData(Authenticator):
     """
-    
+    This class is a conglomerate of functions relating to user data querries in the Spotipy library 
+    (Spotify API python port). This class inherits from the Authenticator class and can therefore 
+    reauthenticate the API access token when need be. Each function that needs this functionality should 
+    have the decorator: @ReauthenticationDecorator.reauthorization_check. As this is a child of the 
+    Authenticator class, it also requires the same input parameters when initializing the class.
 
     """
 
