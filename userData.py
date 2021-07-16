@@ -113,3 +113,78 @@ class UserData(Authenticator):
             topTracksName.append(track['name']) #append only name of track to seperate list
 
         return (topTracksName, topTracks)
+
+    @ReauthenticationDecorator.reauthorization_check
+    def recommendation_genre_seeds(self):
+        """
+        Simply returns spotipy.recommendation_genre_seeds() --> 
+
+        Get a list of genres available for the recommendations function
+
+        Returns
+        -------
+
+        genres: list 
+            A list of all genres that can be used as seed inputs for get_recommendations()
+
+        """
+
+        return self.spotipyObject.recommendation_genre_seeds()['genres']
+
+    @ReauthenticationDecorator.reauthorization_check
+    def get_recommendations(self, seedArtists=None, seedGenres=None, seedTracks=None, limit=20, country=None, **kwargs):
+        """
+        Returns a certain number of song recommendations based on different seeds. 
+
+        Parameters
+        ----------
+
+        seedArtists: list, optional 
+            A list of artists IDs, URIs, or URLs 
+
+        seedTracks: list, optional 
+            A list of track IDs, URIs, or URLs 
+
+        seedGenres: list, optional 
+            A list of genre names. Available genres: ['acoustic', 'afrobeat', 'alt-rock', 'alternative', 'ambient', 'anime', 'black-metal', 'bluegrass', 'blues', 'bossanova', 'brazil', 'breakbeat', 'british', 'cantopop', 'chicago-house', 'children', 'chill', 'classical', 'club', 'comedy', 'country', 'dance', 'dancehall', 'death-metal', 'deep-house', 'detroit-techno', 'disco', 'disney', 'drum-and-bass', 'dub', 'dubstep', 'edm', 'electro', 'electronic', 'emo', 'folk', 'forro', 'french', 'funk', 'garage', 'german', 'gospel', 'goth', 'grindcore', 'groove', 'grunge', 'guitar', 'happy', 'hard-rock', 'hardcore', 'hardstyle', 'heavy-metal', 'hip-hop', 'holidays', 'honky-tonk', 'house', 'idm', 'indian', 'indie', 'indie-pop', 'industrial', 'iranian', 'j-dance', 'j-idol', 'j-pop', 'j-rock', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'malay', 'mandopop', 'metal', 'metal-misc', 'metalcore', 'minimal-techno', 'movies', 'mpb', 'new-age', 'new-release', 'opera', 'pagode', 'party', 'philippines-opm', 'piano', 'pop', 'pop-film', 'post-dubstep', 'power-pop', 'progressive-house', 'psych-rock', 'punk', 'punk-rock', 'r-n-b', 'rainy-day', 'reggae', 'reggaeton', 'road-trip', 'rock', 'rock-n-roll', 'rockabilly', 'romance', 'sad', 'salsa', 'samba', 'sertanejo', 'show-tunes', 'singer-songwriter', 'ska', 'sleep', 'songwriter', 'soul', 'soundtracks', 'spanish', 'study', 'summer', 'swedish', 'synth-pop', 'tango', 'techno', 'trance', 'trip-hop', 'turkish', 'work-out', 'world-music']
+        
+        min/max/target_<attribute>: any, optional
+            attributes that allow for more specificity as to which songs are being requested. More information: https://developer.spotify.com/console/get-recommendations/
+
+        country: str, optional
+            An ISO 3166-1 alpha-2 country code. If provided, all results will be playable in this country.
+
+        limit: int, optional
+            The maximum number of items to return. Default: 20, min: 1, max: 100. 
+
+        Returns
+        -------
+
+        recommendations: list 
+            List of all track recommendations including album, artists, track id, and track name
+
+        """
+
+        #get just the raw recommendations from spotipy without any formatting
+        recommendationsRaw = self.spotipyObject.recommendations(seed_artists=seedArtists, seed_genres=seedGenres, seed_tracks=seedTracks, limit=limit, country=country, kwargs=kwargs)
+        recommendationsRaw = recommendationsRaw['tracks'] #take just the tracks from the recommendations return and not the information on seeds
+
+        recommendations = [] #empty list to reformat data into 
+        usefulKeys = ['album', 'artists', 'id', 'name'] #list of all keys that will be returned with this function. Full list of keys from API is: ['album', 'artists', 'available_markets', 'disc_number', 'duration_ms', 'explicit', 'external_ids', 'external_urls', 'href', 'id', 'is_local', 'name', 'popularity', 'preview_url', 'track_number', 'type', 'uri']
+        for recommendation in recommendationsRaw:
+            trackData = {} #empty dict to put all relevant track data into
+            for key in usefulKeys: #grab only wanted data
+                if key == 'album': #if you just use 'album' entry, you get all information on album. For simplicity, only return name of album
+                    trackData[key] = recommendation[key]['name']
+                elif key == 'artists': #artist also gives more information than necessary... Take out only artist's names
+                    artistsList = [] #empty list to keep track of all artist names
+                    for artist in recommendation[key]:
+                        artistsList.append(artist['name']) #take out only artist name 
+                    trackData[key] = artistsList
+                else:
+                    trackData[key] = recommendation[key]
+                
+            
+            recommendations.append(trackData) #put all useful data into list 
+
+        return recommendations
