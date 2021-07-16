@@ -3,7 +3,7 @@ This file comprises of functions related to controlling playback.
 """
 
 #importing libraries
-from SpotipyFunction_Set.authenticator import Authenticator, ReauthenticationDecorator
+from .authenticator import Authenticator, ReauthenticationDecorator
 
 class Controls(Authenticator):
     """

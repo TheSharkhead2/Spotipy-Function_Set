@@ -3,7 +3,7 @@ This file comprises of functions that have to do with data on currently playing 
 """
 
 #importing libraries
-from SpotipyFunction_Set.authenticator import Authenticator, ReauthenticationDecorator
+from .authenticator import Authenticator, ReauthenticationDecorator
 
 class Playback(Authenticator):
     """

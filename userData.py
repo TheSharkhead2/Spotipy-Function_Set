@@ -4,7 +4,7 @@ This file contains functions (wrapped in class) relating to gathering data on "c
 """
 
 #importing libraries 
-from SpotipyFunction_Set.authenticator import Authenticator, ReauthenticationDecorator
+from .authenticator import Authenticator, ReauthenticationDecorator
 
 class UserData(Authenticator):
     """
