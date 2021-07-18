@@ -142,7 +142,7 @@ class Playback(Authenticator):
     def get_song_attributes(self):
 
         """ 
-        Return a list of song attributes from the Spotify API, including: 
+        Return a list of song attributes of currently playing song from the Spotify API, including: 
         ["artist", "album", "track_name", "track_id", "danceability", "energy", 
         "key", "loudness", "mode", "speechiness", "instrumentalness", "liveness", 
         "valence", "tempo", "duration_ms", "time_signature"]
