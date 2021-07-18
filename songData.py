@@ -50,3 +50,23 @@ class SongData(Authenticator):
             relatedArtists.append({'name' : artist['name'], 'id' : artist['id']}) #take only name and id
 
         return relatedArtists
+
+    @ReauthenticationDecorator.reauthorization_check
+    def artist(self, artists):
+        """
+        This function combines spotipy.artist and spotipy.artists where you can input either a single artist id
+        or a list of artist ids to get more information on the artist(s). 
+
+        Parameters
+        ----------
+
+        artists: str or list 
+            If string, must be 1 artist ID, URI, or URL. If list, must be list of strings that are artist IDs, 
+            URIs, or URLs. 
+
+        """
+
+        if type(artists) is list:
+            return self.spotipyObject.artists(artists)
+        else:
+            return self.spotipyObject.artist(artists)
