@@ -52,7 +52,7 @@ class SongData(Authenticator):
         return relatedArtists
 
     @ReauthenticationDecorator.reauthorization_check
-    def artist(self, artists):
+    def artist(self, artists) -> list:
         """
         This function combines spotipy.artist and spotipy.artists where you can input either a single artist id
         or a list of artist ids to get more information on the artist(s). 
@@ -64,9 +64,19 @@ class SongData(Authenticator):
             If string, must be 1 artist ID, URI, or URL. If list, must be list of strings that are artist IDs, 
             URIs, or URLs. 
 
+        Returns
+        -------
+
+        artistsData: list
+            List of all artist information for all requested artists. (Still list if only one artist queried)
+
         """
 
         if type(artists) is list:
             return self.spotipyObject.artists(artists)
         else:
-            return self.spotipyObject.artist(artists)
+            return [self.spotipyObject.artist(artists)]
+
+    @ReauthenticationDecorator.reauthorization_check
+    def audio_features(self, tracks) -> list:
+        pass
