@@ -19,26 +19,25 @@ class Playback(Authenticator):
         super().__init__(CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope)
 
     @ReauthenticationDecorator.reauthorization_check
-    def basic_song_info(self):
+    def basic_song_info(self) -> "tuple[str,str,str,str]":
         """ 
         Return basic data for currently playing song. This is intended for use with 
         programs displaying the currently playing song and associated data. 
-
-        Parameters 
-        ----------
-        spObject: Spotipy API Object 
-            Spotipy object with scope of: 'user-read-currently playing'
+        Needs scope: 'user-read-currently playing'
 
         Returns
         -------
-        artist: str 
-            The artist name as a string 
-        songName: str 
-            The name of the song as a string 
-        albumName: str 
-            The name of the album as a string 
-        songID: str 
-            The Spotify song id as a string
+
+        tuple[artist, songName, albumName, songId]
+            artist: str 
+                The artist name as a string 
+            songName: str 
+                The name of the song as a string 
+            albumName: str 
+                The name of the album as a string 
+            songID: str 
+                The Spotify song id as a string
+
         """
 
         trackInfo = self.spotipyObject.current_user_playing_track() #get track info for current track
@@ -53,25 +52,23 @@ class Playback(Authenticator):
         return ((artist, songName, albumName, songID))
 
     @ReauthenticationDecorator.reauthorization_check
-    def song_image_info(self):
+    def song_image_info(self) -> "tuple[list, list]":
         """
         Return data around the currently playing song's album image and artist image.
-        This includes information on the various images' size and url.
-
-        Parameters
-        ----------
-        spObject: Spotipy API Object
-            Spotipy object with the scope of: 'user-read-currently-playing'
+        This includes information on the various images' size and url. 
+        Needs scope: 'user-read-currently-playing'
 
         Returns
         -------
-        albumImageData: list
-            List containing dictionaries for all available images for the given album. Each dictionary has the format
-            {height: height, url: url, width:width}
 
-        artistImageData: list
-            List containing dictionaries for all available images for the first listed artist. Each dictionary has the 
-            format {height: height, url:url, width: width}
+        tuple[albumImageData, artistImageData]
+            albumImageData: list 
+                List containing dictionaries for all available images for the given album. Each dictionary 
+                has the format {height: height, url: url, width:width}
+            artistImageData: list
+                List containing dictionaries for all available images for the first listed artist. Each 
+                dictionary has the format {height: height, url:url, width: width}
+
         """
 
         trackInfo = self.spotipyObject.current_user_playing_track() #get track info for current track
@@ -82,25 +79,25 @@ class Playback(Authenticator):
         return albumImageData, artistImageData
 
     @ReauthenticationDecorator.reauthorization_check
-    def playback_time_info(self, format="ms"):
+    def playback_time_info(self, format="ms") -> "tuple [str, str]":
         """
-        Return data about the current time in the currently playing song. 
+        Return data about the current time in the currently playing song. Needs scope: 'user-read-currently-playing'
 
         Parameters
         ----------
-        spObject: Spotipy API Object
-            Spotipy object with the scope of: 'user-read-currently-playing'
 
-        format: string
+        format: str
             "min-sec" or "ms" - output string format, defaults to "ms"
 
         Returns
         -------
-        currentProgress: string
-            String of the current position in the song, formatted according to format.
 
-        totalLength: string
-            String of the total length of the song, formatted according to format.
+        tuple[currentProgress, totalLength]
+            currentProgress: str
+                String of the current position in the song, formatted according to format. 
+            totalLength: str
+                String of the total length of the song, formatted according to format.
+
         """
 
         trackInfo = self.spotipyObject.current_user_playing_track() #get track info for current track
@@ -139,8 +136,7 @@ class Playback(Authenticator):
         return currentProgress, totalLength
 
     @ReauthenticationDecorator.reauthorization_check
-    def get_song_attributes(self):
-
+    def get_song_attributes(self) -> dict:
         """ 
         Return a list of song attributes of currently playing song from the Spotify API, including: 
         ["artist", "album", "track_name", "track_id", "danceability", "energy", 
@@ -148,14 +144,11 @@ class Playback(Authenticator):
         "valence", "tempo", "duration_ms", "time_signature"]
         More informantion on each audio feature here:
         https://developer.spotify.com/documentation/web-api/reference/#object-audiofeaturesobject
-
-        Parameters
-        ----------
-        spObject: Spotipy API Object 
-            Spotipy object with at least the scope of: 'user-read-currently-playing'
+        Needs scope: 'user-read-currently-playing'
 
         Returns
         -------
+
         audioFeatures: dict
             Dictionary mapping all audio features to coorisponding values for said 
             features for currently playing song 

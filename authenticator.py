@@ -78,7 +78,7 @@ class Authenticator:
 
         self._create_user_object()
     
-    def _create_user_object(self):
+    def _create_user_object(self) -> None:
         """
         Set up access token and spotipyObject.
         

@@ -22,7 +22,7 @@ class SongData(Authenticator):
         super().__init__(CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope)
 
     @ReauthenticationDecorator.reauthorization_check
-    def related_artists(self, artistID):
+    def related_artists(self, artistID) -> list:
         """
         This function simply returns spotipy.artist_related_artists() with minimal formatting. Thie means
         it returns a list of similar artists to a specified artist id. 

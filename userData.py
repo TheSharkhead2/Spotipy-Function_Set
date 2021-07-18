@@ -21,7 +21,7 @@ class UserData(Authenticator):
         super().__init__(CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope)
     
     @ReauthenticationDecorator.reauthorization_check
-    def get_top_artists(self, limit=20, offset=0, timeRange='m'):
+    def get_top_artists(self, limit=20, offset=0, timeRange='m') -> "tuple[list, list]":
         """
         Returns the top artists of current user. Requires scope: "user-top-read"
 
@@ -38,9 +38,12 @@ class UserData(Authenticator):
         Returns
         -------
 
-        topArtistsTuple: tuple
-            Tuple containing list of top artists in order with names and a list containing more info on each artist (each entry in 
-            this list contains dict with more info). In format: (topArtistsName, topArtists)
+        tuple[topArtistsName, topArtists]
+            topArtistsName: list 
+                List of top artists (in order) for current user providing only names. All entries are strings
+            topArtists: list 
+                List of top artists (in order) for current user providing more information on each artists 
+                ('followers', 'genres', 'name', 'popularity', 'id'). All entries are dicts. 
 
         """
 
@@ -64,7 +67,7 @@ class UserData(Authenticator):
         return (topArtistsName, topArtists)
 
     @ReauthenticationDecorator.reauthorization_check
-    def get_top_tracks(self, limit=20, offset=0, timeRange='m'):
+    def get_top_tracks(self, limit=20, offset=0, timeRange='m') -> "tuple[list, list]":
         """
         Returns the top tracks of current user. Requires scope: "user-top-read"
         
@@ -81,8 +84,11 @@ class UserData(Authenticator):
         Returns
         -------
 
-        topTracksTuple: tuple
-            Tuple containing, in first index, list of only the names of the user's top tracks and, in second index, list of dictionaries containing this information on each song: ['album', 'artists', 'id', 'name', 'popularity'] 
+        tuple[topTracksName, topTracks]
+            topTracksName: list 
+                List of strings of only names for user top tracks (in order). 
+            topTracks: list 
+                List of dicts of top tracks for user (in order) containing more information on each track: ['album', 'artists', 'id', 'name', 'popularity'] 
 
         """
 
