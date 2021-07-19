@@ -24,11 +24,7 @@ class Controls(Authenticator):
         """
         Return the is_playing boolean to see if spotify is currently playing anything.
         This should be run before other playback functions to prevent indexing errors.
-
-        Parameters
-        ----------
-        spObject: Spotipy API Object 
-            Spotipy object with scope of: 'user-read-currently playing'
+        Needs scope: 'user-read-currently playing'
 
         Returns
         -------
@@ -47,31 +43,26 @@ class Controls(Authenticator):
         return isPlaying
 
     @ReauthenticationDecorator.reauthorization_check
-    def playback_settings_info(self): #this doesn't seem fully implemented 
+    def playback_settings_info(self) -> "tuple[str, str, dict]": #this doesn't seem fully implemented 
         """
         Gets data about current playback's settings: shuffle state, repeat state, and device id/name/type.
-
-        Parameters
-        ----------
-
-        spObject: spotipy API object
-            Spotipy object with any scope
 
         Returns
         -------
 
-        shuffle_state: str
-            True if playback is currently shuffling, False otherwise
+        tuple[shuffle_state, repeat_state, device_info]
+            shuffle_state: str
+                True if playback is currently shuffling, False otherwise
 
-        repeat_state: str
-            "none", "track", or "playlist" depending on current repeat state
+            repeat_state: str
+                "none", "track", or "playlist" depending on current repeat state
 
-        device_info: dict
-            dictionary with device info using the format {
-                "id": device id,
-                "name": device name,
-                "type": device type
-            }
+            device_info: dict
+                dictionary with device info using the format {
+                    "id": device id,
+                    "name": device name,
+                    "type": device type
+                }
 
         """
 
@@ -85,19 +76,18 @@ class Controls(Authenticator):
             "type": data["device"]["type"]
         }
 
+        return shuffle_state, repeate_state, device_info
+
     @ReauthenticationDecorator.reauthorization_check
     def find_song(self, query, count=10) -> list:
         """
         Yes, this technically isn't directly related to controlling playback, but I think it makes the most sense to categorize here since it's really nice to integrate with the add_to_queue
         function.
-
-        This is a function that finds the uri of the most related SONGs for a given query.
+        This is a function that finds the uri of the most related SONGs for a given query. 
+        Needs scope of: "user-read-private"
 
         Parameters
         ----------
-
-        spObject: spotipy API object
-            Spotipy object with scope "user-read-private"
 
         query: str
             String to query the spotify api...things like artist/song/market can be specified using tags 
@@ -116,6 +106,7 @@ class Controls(Authenticator):
                 "name": name (str),
                 "uri": uri (str)
             }
+            
         """
 
         #ensure that the count given is below the limit of 50 and not below 1.
@@ -141,12 +132,7 @@ class Controls(Authenticator):
     def add_song_to_queue(self, songData) -> None:
         """
         Function that adds a song to the user's queue based on the song's data (uri, id, url)
-
-        Parameters
-        ----------
-        
-        spObject: spotipy API object
-            Spotipy object with scope 'user-modify-playback-state'
+        Needs scope: 'user-modify-playback-state'
 
         songData: str
             Desired song's uri, id, or url
@@ -159,12 +145,7 @@ class Controls(Authenticator):
     def skip_next(self) -> None:
         """
         Skips to the next song in the user's queue.
-
-        Parameters
-        ----------
-        spObject: spotipy API object
-            Spotipy object with scope 'user-modify-playback-state'
-
+        Needs scope: 'user-modify-playback-state'
 
         """
         
@@ -173,12 +154,7 @@ class Controls(Authenticator):
     @ReauthenticationDecorator.reauthorization_check
     def skip_previous(self) -> None:
         """
-        Skips to the previous song in the user's queue.
-
-        Parameters
-        ----------
-        spObject: spotipy API object
-            Spotipy object with scope 'user-modify-playback-state'
+        Skips to the previous song in the user's queue. Needs scope: 'user-modify-playback-state'
 
         """
         
@@ -187,13 +163,10 @@ class Controls(Authenticator):
     @ReauthenticationDecorator.reauthorization_check
     def play_pause(self, playback_state=None) -> bool:
         """
-        Pauses playback if something is currently playing, stops playback if nothing is. 
+        Pauses playback if something is currently playing, stops playback if nothing is. Needs scope: 'user-modify-playback-state'
 
         Parameters
         ----------
-
-        spObject: spotipy API object
-            Spotipy object with scope 'user-modify-playback-state'
 
         playback_state: bool (opt.)
             Desired playback state, if any; True if playing, False otherwise
@@ -229,12 +202,7 @@ class Controls(Authenticator):
     def get_devices(self) -> list:
         """
         Gets a list of the user's currently available devices. Like find_song(), this isn't directly related to playback, but is nice to include with switch_to_device().
-
-        Parameters
-        ----------
-        
-        spObject: spotipy API object
-            Spotipy object with scope 'user-read-playback-state'
+        Needs scope: 'user-read-playback-state'
 
         Returns
         -------
@@ -263,12 +231,7 @@ class Controls(Authenticator):
     def switch_to_device(self, device_id) -> None:
         """
         Switches playback to the device specified and starts it.
-
-        Parameters
-        ----------
-
-        spObject: spotipy API object
-            Spotipy object with scope 'user-modify-playback-state'
+        Needs scope: 'user-modify-playback-state'
 
         """
         
@@ -278,13 +241,11 @@ class Controls(Authenticator):
     def get_playlists(self, username, display_username, count=20) -> list:
         """
         Gets up to 50 of the user's playlists. Like get_devices() and find_song(), will be nice to use with switch_to_playlist().
+        Needs scope: 'playlist-read-private'
 
         Parameters
         ----------
 
-        spObject: spotipy API object
-            Spotipy object with scope 'playlist-read-private'
-        
         username: str
             Username of the current spotify user; to make owner names prettier when the owner's playlists are returned
 
@@ -335,12 +296,10 @@ class Controls(Authenticator):
     def switch_to_playlist(self, playlist_id) -> None:
         """
         Switches playback to the given playlist.
+        Needs scope: 'user-modify-playback-state'
 
         Parameters
         ----------
-
-        spObject: spotipy API object
-            Spotipy object with scope 'user-modify-playback-state'
 
         playlist_id: str
             String containing the id of the playlist to switch playback to
@@ -354,13 +313,11 @@ class Controls(Authenticator):
 
         """
         Sets repeat state to a certain value, or alternatively cycles the repeat state 1 forward.
+        Needs scope: 'user-modify-playback-state'
 
         Parameters
         ----------
 
-        spObject: spotipy API object
-            Spotipy object with scope 'user-modify-playback-state'
-        
         repeat_type: str (opt.)
             Desired repeat state: "none", "song", and "playlist"; if None is given will default to cycling 1 setting forward (e.g. "none" --> "song")     
 
@@ -391,12 +348,10 @@ class Controls(Authenticator):
     def change_shuffle(self, shuffle_state=None) -> bool:
         """
         Sets shuffle state to a certain value, or alternatively toggles it.
+        Needs scope: 'user-modify-playback-state'
 
         Parameters
         ----------
-
-        spObject: spotipy API object
-            Spotipy object with scope 'user-modify-playback-state'
 
         shuffle_state: bool (opt.)
             Desired shuffle state; True if shuffle, False if not shuffle; if None is given will default to toggling between shuffle and non-shufffle modes
@@ -423,13 +378,11 @@ class Controls(Authenticator):
     def set_volume(self, volume_level) -> None:
         """
         Sets playback volume to the specified level.
+        Needs scope: 'user-modify-playback-state'
 
         Parameters
         ----------
-
-        spObject: spotipy API object
-            Spotipy object with scope 'user-modify-playback-state'
-
+        
         volume_level: int
             Value between 0 and 100 representing the desired volume level
 
