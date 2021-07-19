@@ -43,7 +43,7 @@ class Controls(Authenticator):
         return isPlaying
 
     @ReauthenticationDecorator.reauthorization_check
-    def playback_settings_info(self) -> "tuple[str, str, dict]": #this doesn't seem fully implemented 
+    def playback_settings_info(self) -> "tuple[str, str, dict]":
         """
         Gets data about current playback's settings: shuffle state, repeat state, and device id/name/type.
 
