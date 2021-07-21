@@ -119,3 +119,32 @@ class SongData(Authenticator):
             audioFeatures.append(songFeatures)
 
         return audioFeatures
+    
+    @ReauthenticationDecorator.reauthorization_check
+    def audio_analysis(self, track) -> dict:
+        """
+        Currently just returns spotipy.audio_analysis() (I don't have sufficient enough understanding of what this is returning
+        to do any formatting)
+
+        Parameters
+        ----------
+
+        track: str 
+            Spotify track id     
+
+        Returns
+        -------
+
+        audioAnalysis: dict 
+            A dictionary of information on the track. Has the keys: ['meta', 'track', 'bars', 'beats', 'sections', 'segments', 'tatums']
+
+        Citations
+        ---------
+
+        Information on audio analysis: https://www.slideshare.net/MarkKoh9/audio-analysis-with-spotifys-web-api
+
+        """
+
+        audioAnalysisRaw = self.spotipyObject.audio_analysis(track)
+
+        return audioAnalysisRaw
