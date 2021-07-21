@@ -52,7 +52,7 @@ class SongData(Authenticator):
         return relatedArtists
 
     @ReauthenticationDecorator.reauthorization_check
-    def artist_top_tracks(self, artistID, country='US'):
+    def artist_top_tracks(self, artistID, country='US') -> list:
         """
         Get top 10 tracks for an artist by country. 
 
@@ -65,6 +65,12 @@ class SongData(Authenticator):
         country: str 
             Country code to which response should be limited to
         
+        Returns 
+        -------
+
+        topTracks: list 
+            List of top tracks (in order). Each track is a dict with basic information on track. 
+
         """
 
         tracksRaw = self.spotipyObject.artist_top_tracks(artist_id=artistID, country=country) #get everything spotipy returns here 
