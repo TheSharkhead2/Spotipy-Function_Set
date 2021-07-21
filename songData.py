@@ -78,5 +78,73 @@ class SongData(Authenticator):
             return [self.spotipyObject.artist(artists)]
 
     @ReauthenticationDecorator.reauthorization_check
-    def audio_features(self, tracks) -> list:
-        pass
+    def audio_features(self, tracks, stripID=True) -> list:
+        """
+        This function is an implementation spotipy.audio_features(). Some of the information returned for each song is 
+        removed (from the original spotipy result) meaning each ID provided, returns the information: 
+        ['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'time_signature']
+
+        This is functionally similar to Playback.get_song_attributes(), however any song ID can be provided (instead of
+        only the currently playing song) and any number of IDs can be provided (max 100, so technically not any).  
+
+        Parameters 
+        ----------
+
+        tracks: list 
+            Any length list which contains Spotify song IDs. 
+
+        stripID: bool, optional 
+            If True, default, song ID will be removed from coorisponding dictionary. If False, ID will be kept. 
+
+        Returns
+        -------
+
+        audioFeatures: list 
+            List of dictionaries that each contain information on each song ID provided.
+
+        """
+
+        audioFeaturesRaw = self.spotipyObject.audio_features(tracks=tracks)
+
+        audioFeatures = [] #empty list to reformat data into
+        usefulKeys = ['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'time_signature'] #Only look at actual audio features and not other stuff this returns (['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'type', 'id', 'uri', 'track_href', 'analysis_url', 'duration_ms', 'time_signature'])
+        for song in audioFeaturesRaw:
+            songFeatures = {} #empty dict to put all useful features into 
+            for key in usefulKeys:
+                songFeatures[key] = song[key]
+            
+            if not stripID:
+                songFeatures['id'] = song['id']
+
+            audioFeatures.append(songFeatures)
+
+        return audioFeatures
+    
+    @ReauthenticationDecorator.reauthorization_check
+    def audio_analysis(self, track) -> dict:
+        """
+        Currently just returns spotipy.audio_analysis() (I don't have sufficient enough understanding of what this is returning
+        to do any formatting)
+
+        Parameters
+        ----------
+
+        track: str 
+            Spotify track id     
+
+        Returns
+        -------
+
+        audioAnalysis: dict 
+            A dictionary of information on the track. Has the keys: ['meta', 'track', 'bars', 'beats', 'sections', 'segments', 'tatums']
+
+        Citations
+        ---------
+
+        Information on audio analysis: https://www.slideshare.net/MarkKoh9/audio-analysis-with-spotifys-web-api
+
+        """
+
+        audioAnalysisRaw = self.spotipyObject.audio_analysis(track)
+
+        return audioAnalysisRaw
