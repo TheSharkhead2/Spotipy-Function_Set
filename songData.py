@@ -251,3 +251,66 @@ class SongData(Authenticator):
         audioAnalysisRaw = self.spotipyObject.audio_analysis(track)
 
         return audioAnalysisRaw
+    
+    @ReauthenticationDecorator.reauthorization_check
+    def categories(self, country=None, locale=None, limit=20, offset=0) -> list:
+        """
+        This simply returns spotipy.categories() (with very, very minimal formatting) as of now. As I don't understand entirely what these are, this is about
+        as much information as I can provide. This is mostly here for completeness. 
+
+        Parameters
+        ----------
+
+        country: str, optional 
+            Country code for location of categories 
+
+        locale: str, optional 
+            Desired language for categories 
+
+        limit: int, optional 
+            The maximum number of items to return. Default 20, min 1, max 50 
+
+        offset: int, optional 
+            The index of the first item to return. Default 0. 
+        
+        Returns
+        -------
+
+        categories: list
+            List of all categories from request
+
+        """
+
+        categoriesRaw = self.spotipyObject.categories(country=country, locale=locale, limit=limit, offset=offset)
+
+        return categoriesRaw['categories']['items']
+    
+    @ReauthenticationDecorator.reauthorization_check
+    def category(self, categoryID, country=None, locale=None) -> dict:
+        """
+        Returns information on Spotify category. As with the categories() function, I don't fully understand these or their purpose
+        so I cannot add much more information. This is mostly here for completeness. 
+
+        Parameters 
+        ----------
+
+        categoryID: str
+            ID of category  
+        
+        country: str, optional 
+            Country code for country with category 
+
+        locale: str, optional 
+            Desired language of category. 
+        
+        Returns
+        -------
+
+        category: dict
+            Dictionary with information on category. 
+
+        """
+
+        categoryRaw = self.spotipyObject.category(category_id=categoryID, country=country, locale=locale)
+
+        return categoryRaw
