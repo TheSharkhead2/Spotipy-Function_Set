@@ -314,3 +314,49 @@ class SongData(Authenticator):
         categoryRaw = self.spotipyObject.category(category_id=categoryID, country=country, locale=locale)
 
         return categoryRaw
+
+    @ReauthenticationDecorator.reauthorization_check
+    def category_playlists(self, categoryID=None, country=None, limit=20, offset=0) -> list:
+        """
+        Get a list of playlists for a specific Spotify category. Does limited formatted (through removing
+        unnecessary information) to spotipy.category_playlists(). 
+
+        Parameters
+        ----------
+
+        categoryID: str, optional 
+            ID of Spotify category. 
+
+        country: str, optional 
+            Country code to specify country 
+
+        limit: int, optional 
+            The maximum number of items to return. Default 20, min 1, max 50. 
+
+        offset: int, optional 
+            The index of the first item to return. Default 0. 
+        
+        Returns
+        -------
+
+        playlists: list 
+            List of playlists in category. 
+
+        """
+
+        playlistsRaw = self.spotipyObject.category_playlists(category_id=categoryID, country=country, limit=limit, offset=offset) #get all that is returned by spotify API
+
+        playlistsRaw = playlistsRaw['playlists']['items'] #remove unecessary dicts 
+
+        playlists = [] #empty list to reformat into 
+        for playlist in playlistsRaw:
+            #grab all useful information from each playlist and append to new, empty list
+            playlists.append({
+                'name' : playlist['name'],
+                'id' : playlist['id'],
+                'description' : playlist['description'],
+                'owner' : {'display_name' : playlist['owner']['display_name'], 'id' : playlist['owner']['id']},
+                'total_tracks' : playlist['tracks']['total']
+            })
+
+        return playlists
