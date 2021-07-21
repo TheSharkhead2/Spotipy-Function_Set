@@ -360,3 +360,75 @@ class SongData(Authenticator):
             })
 
         return playlists
+    
+    @ReauthenticationDecorator.reauthorization_check
+    def playlist(self, playlistID, market=None, detailed=False):
+        """
+        Get information on specified playlist. Will apply some formatting (removing unnecessary information) if detailed=False (or 
+        default value). Ignoring inputs of additional_types and fields from Spotify API as they seem useless for the application
+        of this library or are redundant with the formatting, fields.
+
+        Parameters
+        ----------
+        
+        playlistID: str 
+            ID of Spotify playlist 
+
+        market: str, optional 
+            Country code to specify market. Default: None. 
+
+        detailed: bool, optional
+            If True, will return all information provided by Spotify API function, If False, will apply formatting. Default: False. 
+
+        Returns
+        -------
+
+        playlist: dict 
+            Dictionary with information on playlist. Note: tracks key does not list ALL tracks. Use playlist_items() function for 
+            all tracks. 
+        
+        """
+
+        rawPlaylist = self.spotipyObject.playlist(playlist_id=playlistID, market=market) #get all information that you would from Spotify API 
+
+        if detailed: #if detailed is True, return everything Spotify API does
+            return rawPlaylist
+
+        usefulKeys = ['collaborative', 'description', 'id', 'name', 'public'] #set of useful keys from all dict keys: ['collaborative', 'description', 'external_urls', 'followers', 'href', 'id', 'images', 'name', 'owner', 'primary_color', 'public', 'snapshot_id', 'tracks', 'type', 'uri']
+        returnPlaylist = {} #empty dict to reformat into 
+
+        #take only keys labeled as "useful" in above list
+        for key in usefulKeys:
+            returnPlaylist[key] = rawPlaylist[key]
+        
+        returnPlaylist['followers'] = rawPlaylist['followers']['total'] #take total followers instead of dict with total and an href (to nothing most of the time?)
+        returnPlaylist['owner'] = {'display_name' : rawPlaylist['owner']['display_name'], 'id' : rawPlaylist['owner']['id']} #take only id and name of playlist owner
+        returnPlaylist['total_tracks'] = rawPlaylist['tracks']['total'] #put total tracks into different location in dict 
+
+        tracks = [] #empty list to format tracks into 
+        for track in rawPlaylist['tracks']['items']:
+            #dict to reformat track into. Also take id, name, and added_at, all needing no extra formatting.
+            trackFormatted = {
+                'id' : track['track']['id'],
+                'name' : track['track']['name'],
+                'added_at' : track['added_at']
+            } 
+
+            trackFormatted['added_by'] = track['added_by']['id'] #added_by key is just the id of the user who added the song
+
+            artists = [] #empty list to format artists into 
+            for artist in track['track']['artists']:
+                #take only id and name of each artist 
+                artists.append({
+                    'name' : artist['name'],
+                    'id' : artist['id']
+                })
+            trackFormatted['artists'] = artists #add to formatted track dict 
+
+            trackFormatted['album'] = {'id' : track['track']['album']['id'], 'name' : track['track']['album']['name']} #take only id and name of album
+
+            tracks.append(trackFormatted) #added formatted track to list of formatted tracks
+ 
+        returnPlaylist['tracks'] = tracks #add formatted tracks list to returnPlaylist
+
+        return returnPlaylist
