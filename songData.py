@@ -78,6 +78,66 @@ class SongData(Authenticator):
             return [self.spotipyObject.artist(artists)]
 
     @ReauthenticationDecorator.reauthorization_check
+    def album(self, albums, detailed=False) -> list:
+        """
+        This function returns more information on an album (spotipy.album()). Can take either single id as a
+        string or many as a list.
+
+        Parameters
+        ----------
+
+        albums: str or list 
+            If string, must be 1 album ID, URI, or URL. If list, must be list of strings that are album IDs, 
+            URIs, or URLs.
+        
+        detailed: bool, optional 
+            If False, will remove mostly useless information provided by Spotify API. If True, nothing will be
+            removed. 
+
+        Returns
+        -------
+
+        albumData: list 
+            List of all album data requested. 
+
+        """
+
+        #if list provided simply pass input into albums(), otherwise put into list and then pass into albums()
+        if type(albums) is list:
+            rawAlbumData = self.spotipyObject.albums(albums)
+        else:
+            rawAlbumData = self.spotipyObject.albums([albums])
+        
+        rawAlbumData = rawAlbumData['albums'] #spotipy returns a dict with one key, albums. This uneeded complexity.
+        
+        #if detailed is True, return all of what Spotify returns 
+        if detailed:
+            return rawAlbumData
+
+        albumData = [] #empty list to put reformatted album data into 
+        usefulKeys = ['album_type', 'genres', 'id', 'images', 'label', 'name', 'popularity', 'release_date', 'total_tracks'] #only useful information from: ['album_type', 'artists', 'available_markets', 'copyrights', 'external_ids', 'external_urls', 'genres', 'href', 'id', 'images', 'label', 'name', 'popularity', 'release_date', 'release_date_precision', 'total_tracks', 'tracks', 'type', 'uri']
+        for album in rawAlbumData:
+            reformattedAlbum = {} #empty dict to reformat into 
+            for key in usefulKeys: #take only "useful" keys
+                reformattedAlbum[key] = album[key]
+            
+            albumArtists = [] #empty list to put only necessary artist information into 
+            for artist in album['artists']:
+                albumArtists.append({'id' : artist['id'], 'name' : artist['name']}) #take only artist id and name 
+
+            reformattedAlbum['artists'] = albumArtists #add reformatted artists to reformattedAlbum dict 
+
+            albumTracks = [] #empty list to reformat album tracks into
+            for track in album['tracks']['items']:
+                albumTracks.append(track['id']) #take only the track id as more information on each track can be requested through other means 
+            
+            reformattedAlbum['tracks'] = albumTracks #add reformatted tracks to reformatted album dict
+            
+            albumData.append(reformattedAlbum) #add reformatted dict back to albumData 
+        
+        return albumData
+
+    @ReauthenticationDecorator.reauthorization_check
     def audio_features(self, tracks, stripID=True) -> list:
         """
         This function is an implementation spotipy.audio_features(). Some of the information returned for each song is 
