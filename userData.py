@@ -194,3 +194,37 @@ class UserData(Authenticator):
             recommendations.append(trackData) #put all useful data into list 
 
         return recommendations
+
+    @ReauthenticationDecorator.reauthorization_check
+    def current_user(self, detailed=False) -> dict:
+        """
+        Implements spotipy.current_user() and returns essentially what this does, however with mild formatting. 
+
+        Parameters
+        ----------
+
+        detailed: bool, optional
+            If True, will return all information provided by Spotify API. If False, will apply mild formatting 
+            (removing uneeded information). Default: False. 
+
+        Returns
+        -------
+
+        user: dict
+            Dictionary with information on current user. 
+        
+        """
+
+        userRaw = self.spotipyObject.current_user() #get all information from Spotify API
+
+        if detailed: #if function request details a need for all information, return it all 
+            return userRaw
+
+        #grab only useful information from raw user data
+        user = {
+            'display_name' : userRaw['display_name'],
+            'id' : userRaw['id'],
+            'followers' : userRaw['followers']['total'],
+        }
+
+        return user
