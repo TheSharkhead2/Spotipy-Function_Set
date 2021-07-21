@@ -52,6 +52,43 @@ class SongData(Authenticator):
         return relatedArtists
 
     @ReauthenticationDecorator.reauthorization_check
+    def artist_top_tracks(self, artistID, country='US'):
+        """
+        Get top 10 tracks for an artist by country. 
+
+        Parameters
+        ----------
+
+        artistID: str
+            The artist ID, URI, or URL
+
+        country: str 
+            Country code to which response should be limited to
+        
+        """
+
+        tracksRaw = self.spotipyObject.artist_top_tracks(artist_id=artistID, country=country) #get everything spotipy returns here 
+
+        tracksRaw = tracksRaw['tracks'] #just remove outer dict which does nothing
+
+        topTracks = [] #empty list to reformat into 
+        for track in tracksRaw:
+            trackFormatted = {'id': track['id'], 'name' : track['name'], 'popularity' : track['popularity']} #dict to reformat track into. Also carry over id, name, and popularity (all which need no extra formatting)
+
+            trackFormatted['album'] = {'id' : track['album']['id'], 'name' : track['album']['name']} #for album, keep only id and name of album 
+
+            artistsFormatted = [] #empty list to reformat artists into 
+            for artist in track['artists']:
+                artistsFormatted.append({'name' : artist['name'], 'id' : artist['id']}) #for each artist, keep only name and id 
+            
+            trackFormatted['artists'] = artistsFormatted #add formatted artist list to formatted track dict 
+
+            topTracks.append(trackFormatted) #add to "master" list 
+
+
+        return topTracks
+
+    @ReauthenticationDecorator.reauthorization_check
     def artist(self, artists) -> list:
         """
         This function combines spotipy.artist and spotipy.artists where you can input either a single artist id
