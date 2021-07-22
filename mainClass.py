@@ -6,10 +6,10 @@ other classes (ie, it "holds" instances of all other classes).
 """
 
 #import classes 
-from controls import Controls
-from playback import Playback
-from songData import SongData
-from userData import UserData
+from .controls import Controls
+from .playback import Playback
+from .songData import SongData
+from .userData import UserData
 
 class Spotipy2:
     """
