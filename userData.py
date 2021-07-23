@@ -3,6 +3,9 @@ This file contains functions (wrapped in class) relating to gathering data on "c
 
 """
 
+#importing external libraries
+import datetime
+
 #importing libraries 
 from .authenticator import Authenticator, ReauthenticationDecorator
 
@@ -228,3 +231,82 @@ class UserData(Authenticator):
         }
 
         return user
+
+    @ReauthenticationDecorator.reauthorization_check
+    def recently_played(self, limit=50, after=None, before=None, dateFormat='unix') -> list:
+        """
+        Implements spotipy.current_user_recently_played(). Returns the current user's recently played tracks. 
+        Needs scope: 'user-read-recently-played'
+
+        Parameters
+        ----------
+
+        limit: int, optional 
+            The number of tracks to return. Default: 50. (Max 50, min 1)
+
+        after: int or tuple(year, month, day, hour, minute, second) or datetime object, optional 
+            After, but not including, this specified time (for looking at recently played). Cannot be used if before
+            is specified. If dateFormat = 'unix', must be unix timestamp in milliseconds. If dateFormat = 'dt', must
+            be datetime object. If dateFormat = 'tup', must be tuple in the form: (year, month, day, hour, minute, 
+            second).
+
+        before: int or tuple(year, month, day, hour, minute, second) or datetime object, optional 
+            Before, but not including, this specified time (for looking at recently played). Cannot be used if
+            after is specified. If dateFormat = 'unix', must be unix timestamp in milliseconds. If dateFormat = 'dt', 
+            must be datetime object. If dateFormat = 'tup', must be tuple in the form: (year, month, day, hour, 
+            minute, second).
+
+        dateFormat: str, optional 
+            Specifies what time format is being used for after or before parameters. If 'unix', specifies Unix 
+            timestamp in milliseconds. If 'dt', specifies datetime object. If 'tup' specifies tuple representing 
+            date in this form: (year, month, day, hour, minute, second). 
+
+        Returns
+        -------
+
+        tracks: list 
+            List of all recently played tracks in order from most recent to least recent.
+
+        """
+
+        #code for dealing with different times 
+        if dateFormat == 'unix':
+            pass #do nothing if unix is specified as this should be the same format Spotify uses 
+        elif dateFormat == 'dt':
+            if after != None:
+                after = int(after.timestamp() * 1000) #find unix timestamp in seconds from datetime object and convert to milliseconds 
+            elif before != None:
+                before = int(before.timestamp() * 1000) #same as above, however for before 
+        elif dateFormat == 'tup':
+            if after != None:
+                after = int(datetime.datetime(after[0], after[1], after[2], hour=after[3], minute=after[4], second=after[5]).timestamp() * 1000) #convert "tuple time" into datetime object and find unix timestamp then convert to milliseconds
+            elif before != None:
+                before = int(datetime.datetime(before[0], before[1], before[2], hour=before[3], minute=before[4], second=before[5]).timestamp() * 1000) #same as above, simply for before
+
+        recentlyPlayedRaw = self.spotipyObject.current_user_recently_played(limit=limit, after=after, before=before) #get all the raw data from the Spotify API 
+        recentlyPlayedRaw = recentlyPlayedRaw['items'] #ignore Spotify API returning information on API query 
+
+        tracks = [] #empty list to reformat into
+        for track in recentlyPlayedRaw: #loop through all tracks 
+            #define dict to reformat track dict into
+            formattedTrack = {
+                'id' : track['track']['id'],
+                'name' : track['track']['name'],
+                'album' : {'id' : track['track']['album']['id'], 'name' : track['track']['album']['name']},
+                'played_at' : track['played_at']
+            } 
+
+            artists = []
+            for artist in track['track']['artists']:
+                #grab only name and id of artist
+                artist = {
+                    'id' : artist['id'],
+                    'name' : artist['name']
+                }
+                
+                artists.append(artist) #add to list of artists
+
+            formattedTrack['artists'] = artists #add artist variable to formattedTrack dict 
+            tracks.append(formattedTrack) #add formattedTrack to list of all tracks 
+
+        return tracks
