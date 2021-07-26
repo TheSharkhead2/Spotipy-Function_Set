@@ -70,7 +70,7 @@ class UserData(Authenticator):
         return (topArtistsName, topArtists)
 
     @ReauthenticationDecorator.reauthorization_check
-    def get_top_tracks(self, limit=20, offset=0, timeRange='m') -> "tuple[list, list]":
+    def get_top_tracks(self, limit=20, offset=0, timeRange='m', detailed=False) -> "tuple[list, list]":
         """
         Returns the top tracks of current user. Requires scope: "user-top-read"
         
@@ -83,7 +83,9 @@ class UserData(Authenticator):
             Offset for top artists, how far forward from top (an offset of 10 would return artists starting at the 10th highest).
         timeRange: str, optional 
             Over what time frame top artists are picked from. Either: s (short term), m (medium term), l (long term)
-        
+        detailed: bool, optional 
+            If False, return formatted version of API call. If True, return full API call. Default: False
+
         Returns
         -------
 
@@ -98,6 +100,8 @@ class UserData(Authenticator):
         timeRangeDef = {'s' : 'short_term', 'm' : 'medium_term', 'l' : 'long_term'} #dict to translate single letter inputs into strings used by Spotipy 
 
         topTracksRaw = self.spotipyObject.current_user_top_tracks(limit=limit, offset=offset, time_range=timeRangeDef[timeRange])
+        if detailed: #return with no formatting if detailed == True 
+            return topTracksRaw
 
         topTracksRaw = topTracksRaw['items'] #take only list of tracks
 
