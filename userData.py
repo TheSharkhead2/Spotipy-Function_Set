@@ -233,7 +233,7 @@ class UserData(Authenticator):
         return user
 
     @ReauthenticationDecorator.reauthorization_check
-    def recently_played(self, limit=50, after=None, before=None, dateFormat='unix') -> list:
+    def recently_played(self, limit=50, after=None, before=None, dateFormat='unix', detailed=False) -> list:
         """
         Implements spotipy.current_user_recently_played(). Returns the current user's recently played tracks. 
         Needs scope: 'user-read-recently-played'
@@ -261,6 +261,9 @@ class UserData(Authenticator):
             timestamp in milliseconds. If 'dt', specifies datetime object. If 'tup' specifies tuple representing 
             date in this form: (year, month, day, hour, minute, second). 
 
+        detailed: bool, optional 
+            If False, return formatted version of API call. If True, return all infromation from API call. Default: False. 
+
         Returns
         -------
 
@@ -284,6 +287,9 @@ class UserData(Authenticator):
                 before = int(datetime.datetime(before[0], before[1], before[2], hour=before[3], minute=before[4], second=before[5]).timestamp() * 1000) #same as above, simply for before
 
         recentlyPlayedRaw = self.spotipyObject.current_user_recently_played(limit=limit, after=after, before=before) #get all the raw data from the Spotify API 
+        if detailed: #return all of API call if detailed True
+            return recentlyPlayedRaw
+
         recentlyPlayedRaw = recentlyPlayedRaw['items'] #ignore Spotify API returning information on API query 
 
         tracks = [] #empty list to reformat into
