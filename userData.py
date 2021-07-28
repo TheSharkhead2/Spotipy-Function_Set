@@ -240,7 +240,9 @@ class UserData(Authenticator):
     def recently_played(self, limit=50, after=None, before=None, dateFormat='unix', detailed=False) -> list:
         """
         Implements spotipy.current_user_recently_played(). Returns the current user's recently played tracks. 
-        Needs scope: 'user-read-recently-played'
+        Needs scope: 'user-read-recently-played' 
+
+        Note: only stores last 50 plays. 
 
         Parameters
         ----------
@@ -320,3 +322,48 @@ class UserData(Authenticator):
             tracks.append(formattedTrack) #add formattedTrack to list of all tracks 
 
         return tracks
+    
+    @ReauthenticationDecorator.reauthorization_check
+    def current_user_playlists(self,limit=50, offset=0, detailed=False) -> list:
+        """
+        Get a list of current user's playlists. Need scope: 'playlist-read-private' for private playlists
+        and scope: 'playlist-read-collaborative' for collaborative playlists.
+
+        Parameters
+        ----------
+
+        limit: int, optional
+            The max number of playlists to return in querry. Default: 50.
+
+        offset: int, optional 
+            Starting index of first playlist returned. 
+
+        detailed: bool, optional 
+            If True, return all information from Spotify API. If False, apply formatting. Default: False.
+
+        Returns
+        -------
+
+        playlists: list
+            List of all user's playlists
+
+        """
+
+        playlistsRaw = self.spotipyObject.current_user_playlists(limit=limit, offset=offset) #get all playlists and information from spotipy library
+        if detailed: #return all information if detailed == True
+            return playlistsRaw
+
+        playlistsRaw = playlistsRaw['items'] #take only playlists and not other information on API call
+
+        playlists = [] #empty list to append formatted playlists to
+        for playlist in playlistsRaw:
+            playlistFormatted = {
+                'collaborative' : playlist['collaborative'],
+                'description' : playlist['description'],
+                'id' : playlist['id'],
+                'image_url' : playlist['images'][0]['url'], #take only highest resolution image and only image url, not dimentions of image
+                'name' : playlist['name'],
+                
+            }
+
+        return playlists
