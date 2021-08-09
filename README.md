@@ -30,6 +30,6 @@ In the future, if we finish up this library, we will probably consider working o
 When we were working with Spotipy before we started work on this project, we had a handful of issues that held us back from making significant proggress at times. This included, but is not limited to: 
 - Spotipy randomly requiring re-authentication 
 - Confusing or messy data being returned that was difficult to sift through 
-- Programs required significant error handling as Spotipy would easily error if music wasn't being played or if it incountered other somewhat common occurances 
+- Programs required significant error handling as Spotipy would easily error if music wasn't being played or if it encountered other somewhat common occurances 
 
 In another way, many of our issues could be traced to simply not understanding the API well enough. By working on this project, we have also been able to get a better grasp on how it functions such that we can more easily work on new projects in the future. 
