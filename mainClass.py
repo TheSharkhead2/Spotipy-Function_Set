@@ -42,8 +42,23 @@ class Spotipy2:
 
     def __init__(self, CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope) -> None:
 
+        #Save variables as class properties, simplifies changing the scope and adding other future functionality
+        self.CLIENT_ID = CLIENT_ID
+        self.CLIENT_SECRET = CLIENT_SECRET
+        self.SPOTIFY_USERNAME = SPOTIFY_USERNAME
+        self.redirect_uri = redirect_uri
+        self.scope = scope
+
         #Define all "subclasses"
-        self.Controls = Controls(CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope)
-        self.Playback = Playback(CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope)
-        self.SongData = SongData(CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope)
-        self.UserData = UserData(CLIENT_ID, CLIENT_SECRET, SPOTIFY_USERNAME, redirect_uri, scope)
+        self.Controls = Controls(self.CLIENT_ID, self.CLIENT_SECRET, self.SPOTIFY_USERNAME, self.redirect_uri, self.scope)
+        self.Playback = Playback(self.CLIENT_ID, self.CLIENT_SECRET, self.SPOTIFY_USERNAME, self.redirect_uri, self.scope)
+        self.SongData = SongData(self.CLIENT_ID, self.CLIENT_SECRET, self.SPOTIFY_USERNAME, self.redirect_uri, self.scope)
+        self.UserData = UserData(self.CLIENT_ID, self.CLIENT_SECRET, self.SPOTIFY_USERNAME, self.redirect_uri, self.scope)
+
+    def change_subclass_scopes(self, new_scope) -> None:
+
+        #redefine all "subclasses" according to the needed new scope
+        self.Controls = Controls(self.CLIENT_ID, self.CLIENT_SECRET, self.SPOTIFY_USERNAME, self.redirect_uri, new_scope)
+        self.Playback = Playback(self.CLIENT_ID, self.CLIENT_SECRET, self.SPOTIFY_USERNAME, self.redirect_uri, new_scope)
+        self.SongData = SongData(self.CLIENT_ID, self.CLIENT_SECRET, self.SPOTIFY_USERNAME, self.redirect_uri, new_scope)
+        self.UserData = UserData(self.CLIENT_ID, self.CLIENT_SECRET, self.SPOTIFY_USERNAME, self.redirect_uri, new_scope)
